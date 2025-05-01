@@ -1,37 +1,32 @@
-[![progress-banner](https://backend.codecrafters.io/progress/http-server/89a8a3de-8f94-41d2-a5bb-8ea09bdee603)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# Basic HTTP Server in Python
 
-This is a starting point for Python solutions to the
-["Build Your Own HTTP server" Challenge](https://app.codecrafters.io/courses/http-server/overview).
+This project is a minimal, functional HTTP server built using raw Python sockets. It was developed as part of the **"Build Your Own HTTP Server"** challenge by CodeCrafters and serves as a hands-on learning experience in understanding how HTTP and servers work at a low level.
 
-[HTTP](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) is the
-protocol that powers the web. In this challenge, you'll build a HTTP/1.1 server
-that is capable of serving multiple clients.
+---
 
-Along the way you'll learn about TCP servers,
-[HTTP request syntax](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html),
-and more.
+## Features
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+- Handles HTTP/1.1 GET requests
+- Serves static files from a specified directory
+- Supports concurrent client connections using threads
+- Written with low-level socket programming in Python
+- Follows standard HTTP conventions
 
-# Passing the first stage
+---
 
-The entry point for your HTTP server implementation is in `app/main.py`. Study
-and uncomment the relevant code, and push your changes to pass the first stage:
+## Getting Started
 
-```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
-```
+### Prerequisites
+- Python 3.7+ (Python 3.13 recommended by CodeCrafters)
 
-Time to move on to the next stage!
+### Installation
 
-# Stage 2 & beyond
+```bash
+# Clone the repository
+git clone https://github.com/Swayam0804/basic-http-server-python.git
 
-Note: This section is for stages 2 and beyond.
+# Navigate into the project directory
+cd basic-http-server-python
 
-1. Ensure you have `python (3.13)` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
-   `app/main.py`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+# Run the main server script
+python app/main.py
