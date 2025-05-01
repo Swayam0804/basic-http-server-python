@@ -41,25 +41,26 @@ def handle_client(client_socket):
         accept_encoding = headers.get("accept-encoding", "").lower()
         connection_value = headers.get("connection", "keep-alive").lower()
 
-        # Prepare response
         status_line = "HTTP/1.1 200 OK\r\n"
         body = ""
+
         response_headers = {
             "Content-Type": "text/plain",
             "Connection": connection_value
         }
 
-        if method == "GET" and path == "/":
-            body = "Hello, World!"
-        elif method == "GET" and path.startswith("/echo/"):
+        if method == "GET" and path.startswith("/echo/"):
             body = path[len("/echo/"):]
+        elif method == "GET" and path == "/":
+            body = "Hello, World!"
         else:
             client_socket.sendall(b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n")
             client_socket.close()
             return
 
+        # ✅ Add this if gzip is accepted
         if "gzip" in accept_encoding:
-            response_headers["Content-Encoding"] = "gzip"  # Just declaring, not compressing
+            response_headers["Content-Encoding"] = "gzip"
 
         response_headers["Content-Length"] = str(len(body))
         header_lines = [status_line] + [f"{k}: {v}" for k, v in response_headers.items()]
