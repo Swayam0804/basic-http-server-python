@@ -1,6 +1,6 @@
 # Basic HTTP Server in Python
 
-This project is a minimal, functional HTTP server built using raw Python sockets. It was developed as part of the **"Build Your Own HTTP Server"** challenge by CodeCrafters and serves as a hands-on learning experience in understanding how HTTP and servers work at a low level.
+This project is a minimal, functional HTTP server built using raw Python sockets. It was developed as part of the **"Build Your Own HTTP Server"** challenge by codecrafters.io and serves as a hands-on learning experience in understanding how HTTP and servers work at a low level.
 
 ---
 
