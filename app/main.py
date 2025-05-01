@@ -3,13 +3,12 @@ import _thread
 import sys
 import os
 
-# Get file directory from --directory argument
 def get_directory():
     args = sys.argv
     if "--directory" in args:
-        index = args.index("--directory")
-        if index + 1 < len(args):
-            return args[index + 1]
+        idx = args.index("--directory")
+        if idx + 1 < len(args):
+            return args[idx + 1]
     return "."
 
 files_dir = get_directory()
@@ -21,7 +20,7 @@ def handle_client(client_socket):
             while True:
                 part = client_socket.recv(1024)
                 if not part:
-                    return  # Client closed connection
+                    return
                 data += part
                 if b"\r\n\r\n" in data:
                     break
@@ -49,9 +48,7 @@ def handle_client(client_socket):
             method = parts[0]
             path = parts[1]
 
-            # Default to keep-alive (HTTP/1.1)
-            connection_header = headers.get("connection", "").lower()
-            keep_alive = connection_header != "close"
+            connection_close = headers.get("connection", "").lower() == "close"
 
             if method == "GET" and path == "/":
                 response = "HTTP/1.1 200 OK\r\n\r\n"
@@ -79,9 +76,9 @@ def handle_client(client_socket):
 
             elif method == "GET" and path.startswith("/files/"):
                 filename = path[len("/files/"):]
-                file_path = os.path.join(files_dir, filename)
-                if os.path.isfile(file_path):
-                    with open(file_path, "rb") as f:
+                filepath = os.path.join(files_dir, filename)
+                if os.path.isfile(filepath):
+                    with open(filepath, "rb") as f:
                         content = f.read()
                     response = (
                         "HTTP/1.1 200 OK\r\n"
@@ -94,20 +91,21 @@ def handle_client(client_socket):
 
             elif method == "POST" and path.startswith("/files/"):
                 filename = path[len("/files/"):]
-                file_path = os.path.join(files_dir, filename)
+                filepath = os.path.join(files_dir, filename)
                 content_length = int(headers.get("content-length", 0))
 
                 while len(body) < content_length:
                     body += client_socket.recv(1024)
 
-                with open(file_path, "wb") as f:
+                with open(filepath, "wb") as f:
                     f.write(body)
+
                 client_socket.sendall(b"HTTP/1.1 201 Created\r\n\r\n")
 
             else:
                 client_socket.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
 
-            if not keep_alive:
+            if connection_close:
                 break
 
     except Exception as e:
@@ -118,6 +116,8 @@ def handle_client(client_socket):
 def main():
     print("Server running at http://localhost:4221")
     server_socket = socket.create_server(("localhost", 4221))
+    server_socket.listen()
+
     while True:
         client_socket, _ = server_socket.accept()
         _thread.start_new_thread(handle_client, (client_socket,))
