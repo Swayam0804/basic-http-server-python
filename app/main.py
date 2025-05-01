@@ -42,22 +42,24 @@ def handle_client(client_socket):
 
             parts = request_line.split()
             if len(parts) < 2:
-                client_socket.sendall(b"HTTP/1.1 400 Bad Request\r\n\r\n")
-                continue
+                client_socket.sendall(b"HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n")
+                break
 
             method = parts[0]
             path = parts[1]
 
             connection_close = headers.get("connection", "").lower() == "close"
+            connection_header = "Connection: close\r\n" if connection_close else "Connection: keep-alive\r\n"
 
             if method == "GET" and path == "/":
-                response = "HTTP/1.1 200 OK\r\n\r\n"
+                response = "HTTP/1.1 200 OK\r\n" + connection_header + "\r\n"
                 client_socket.sendall(response.encode())
 
             elif method == "GET" and path.startswith("/echo/"):
                 message = path[len("/echo/"):]
                 response = (
                     "HTTP/1.1 200 OK\r\n"
+                    f"{connection_header}"
                     "Content-Type: text/plain\r\n"
                     f"Content-Length: {len(message)}\r\n\r\n"
                     f"{message}"
@@ -68,6 +70,7 @@ def handle_client(client_socket):
                 ua = headers.get("user-agent", "")
                 response = (
                     "HTTP/1.1 200 OK\r\n"
+                    f"{connection_header}"
                     "Content-Type: text/plain\r\n"
                     f"Content-Length: {len(ua)}\r\n\r\n"
                     f"{ua}"
@@ -82,12 +85,14 @@ def handle_client(client_socket):
                         content = f.read()
                     response = (
                         "HTTP/1.1 200 OK\r\n"
+                        f"{connection_header}"
                         "Content-Type: application/octet-stream\r\n"
                         f"Content-Length: {len(content)}\r\n\r\n"
                     ).encode() + content
                     client_socket.sendall(response)
                 else:
-                    client_socket.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+                    response = f"HTTP/1.1 404 Not Found\r\n{connection_header}\r\n"
+                    client_socket.sendall(response.encode())
 
             elif method == "POST" and path.startswith("/files/"):
                 filename = path[len("/files/"):]
@@ -100,10 +105,12 @@ def handle_client(client_socket):
                 with open(filepath, "wb") as f:
                     f.write(body)
 
-                client_socket.sendall(b"HTTP/1.1 201 Created\r\n\r\n")
+                response = f"HTTP/1.1 201 Created\r\n{connection_header}\r\n"
+                client_socket.sendall(response.encode())
 
             else:
-                client_socket.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+                response = f"HTTP/1.1 404 Not Found\r\n{connection_header}\r\n"
+                client_socket.sendall(response.encode())
 
             if connection_close:
                 break
