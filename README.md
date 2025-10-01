@@ -23,7 +23,7 @@ This project is a minimal, functional HTTP server built using raw Python sockets
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/basic-http-server-python.git
+git clone https://github.com/Swayam0804/basic-http-server-python.git
 
 # Navigate into the project directory
 cd basic-http-server-python
